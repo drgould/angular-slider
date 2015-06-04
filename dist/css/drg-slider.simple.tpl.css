@@ -1,0 +1,218 @@
+/* line 2, /Users/dgould/Documents/Projects/angular-slider/src/css/drg-slider.scss */
+drg-slider,
+[drg-slider] {
+  position: relative;
+  display: block;
+}
+
+/* line 6, /Users/dgould/Documents/Projects/angular-slider/src/css/drg-slider.scss */
+drg-slider,
+drg-slider *,
+[drg-slider], [drg-slider] * {
+  box-sizing: border-box;
+}
+
+/* line 11, /Users/dgould/Documents/Projects/angular-slider/src/css/drg-slider.scss */
+drg-slider drg-slider-knob,
+drg-slider [drg-slider-knob],
+[drg-slider] drg-slider-knob,
+[drg-slider] [drg-slider-knob] {
+  position: absolute;
+  display: block;
+  -ms-touch-action: none;
+  touch-action: none;
+}
+
+/* line 19, /Users/dgould/Documents/Projects/angular-slider/src/css/drg-slider.scss */
+drg-slider drg-slider-bar,
+drg-slider [drg-slider-bar],
+[drg-slider] drg-slider-bar,
+[drg-slider] [drg-slider-bar] {
+  position: absolute;
+  display: block;
+  -ms-touch-action: none;
+  touch-action: none;
+}
+
+/* line 19, stdin */
+drg-slider,
+[drg-slider] {
+  background-color: #EEEEEE;
+  border: 1px solid #DDDDDD;
+  margin: 3px 0;
+  border-radius: 5px;
+}
+
+/* line 25, stdin */
+drg-slider.drg-slider-horizontal,
+[drg-slider].drg-slider-horizontal {
+  width: 500px;
+  height: 10px;
+}
+
+/* line 30, stdin */
+drg-slider.drg-slider-horizontal drg-slider-knob,
+drg-slider.drg-slider-horizontal [drg-slider-knob],
+[drg-slider].drg-slider-horizontal drg-slider-knob,
+[drg-slider].drg-slider-horizontal [drg-slider-knob] {
+  top: -4px !important;
+}
+
+/* line 35, stdin */
+drg-slider.drg-slider-horizontal drg-slider-bar,
+drg-slider.drg-slider-horizontal [drg-slider-bar],
+[drg-slider].drg-slider-horizontal drg-slider-bar,
+[drg-slider].drg-slider-horizontal [drg-slider-bar] {
+  top: 0 !important;
+  height: 100% !important;
+}
+
+/* line 39, stdin */
+drg-slider.drg-slider-horizontal drg-slider-bar:first-of-type,
+drg-slider.drg-slider-horizontal [drg-slider-bar]:first-of-type,
+[drg-slider].drg-slider-horizontal drg-slider-bar:first-of-type,
+[drg-slider].drg-slider-horizontal [drg-slider-bar]:first-of-type {
+  border-radius: 5px 0 0 5px;
+}
+
+/* line 42, stdin */
+drg-slider.drg-slider-horizontal drg-slider-bar:last-of-type,
+drg-slider.drg-slider-horizontal [drg-slider-bar]:last-of-type,
+[drg-slider].drg-slider-horizontal drg-slider-bar:last-of-type,
+[drg-slider].drg-slider-horizontal [drg-slider-bar]:last-of-type {
+  border-radius: 0 5px 5px 0;
+}
+
+/* line 47, stdin */
+drg-slider.drg-slider-vertical,
+[drg-slider].drg-slider-vertical {
+  width: 10px;
+  height: 500px;
+}
+
+/* line 52, stdin */
+drg-slider.drg-slider-vertical drg-slider-knob,
+drg-slider.drg-slider-vertical [drg-slider-knob],
+[drg-slider].drg-slider-vertical drg-slider-knob,
+[drg-slider].drg-slider-vertical [drg-slider-knob] {
+  left: -4px !important;
+}
+
+/* line 57, stdin */
+drg-slider.drg-slider-vertical drg-slider-bar,
+drg-slider.drg-slider-vertical [drg-slider-bar],
+[drg-slider].drg-slider-vertical drg-slider-bar,
+[drg-slider].drg-slider-vertical [drg-slider-bar] {
+  left: 0 !important;
+  width: 100% !important;
+}
+
+/* line 61, stdin */
+drg-slider.drg-slider-vertical drg-slider-bar:first-of-type,
+drg-slider.drg-slider-vertical [drg-slider-bar]:first-of-type,
+[drg-slider].drg-slider-vertical drg-slider-bar:first-of-type,
+[drg-slider].drg-slider-vertical [drg-slider-bar]:first-of-type {
+  border-radius: 5px 5px 0 0;
+}
+
+/* line 64, stdin */
+drg-slider.drg-slider-vertical drg-slider-bar:last-of-type,
+drg-slider.drg-slider-vertical [drg-slider-bar]:last-of-type,
+[drg-slider].drg-slider-vertical drg-slider-bar:last-of-type,
+[drg-slider].drg-slider-vertical [drg-slider-bar]:last-of-type {
+  border-radius: 0 0 5px 5px;
+}
+
+/* line 71, stdin */
+drg-slider drg-slider-knob,
+drg-slider [drg-slider-knob],
+[drg-slider] drg-slider-knob,
+[drg-slider] [drg-slider-knob] {
+  height: 16px;
+  width: 16px;
+  background-color: #ccc;
+  border: 1px solid #aaa;
+  border-radius: 8px;
+}
+
+/* line 80, stdin */
+drg-slider drg-slider-knob:hover,
+drg-slider drg-slider-knob:focus,
+drg-slider drg-slider-knob.active,
+drg-slider [drg-slider-knob]:hover,
+drg-slider [drg-slider-knob]:focus,
+drg-slider [drg-slider-knob].active,
+[drg-slider] drg-slider-knob:hover,
+[drg-slider] drg-slider-knob:focus,
+[drg-slider] drg-slider-knob.active,
+[drg-slider] [drg-slider-knob]:hover,
+[drg-slider] [drg-slider-knob]:focus,
+[drg-slider] [drg-slider-knob].active {
+  background-color: #a6a6a6;
+  border-color: #848484;
+  cursor: pointer;
+}
+
+/* line 89, stdin */
+drg-slider drg-slider-bar:nth-last-of-type(odd),
+drg-slider [drg-slider-bar]:nth-last-of-type(odd),
+[drg-slider] drg-slider-bar:nth-last-of-type(odd),
+[drg-slider] [drg-slider-bar]:nth-last-of-type(odd) {
+  background-color: #f56b3a;
+}
+
+/* line 94, stdin */
+drg-slider drg-slider-bar:nth-last-of-type(odd):hover,
+drg-slider drg-slider-bar:nth-last-of-type(odd):focus,
+drg-slider drg-slider-bar:nth-last-of-type(odd).active,
+drg-slider [drg-slider-bar]:nth-last-of-type(odd):hover,
+drg-slider [drg-slider-bar]:nth-last-of-type(odd):focus,
+drg-slider [drg-slider-bar]:nth-last-of-type(odd).active,
+[drg-slider] drg-slider-bar:nth-last-of-type(odd):hover,
+[drg-slider] drg-slider-bar:nth-last-of-type(odd):focus,
+[drg-slider] drg-slider-bar:nth-last-of-type(odd).active,
+[drg-slider] [drg-slider-bar]:nth-last-of-type(odd):hover,
+[drg-slider] [drg-slider-bar]:nth-last-of-type(odd):focus,
+[drg-slider] [drg-slider-bar]:nth-last-of-type(odd).active {
+  background-color: #d8410b;
+}
+
+/* line 98, stdin */
+drg-slider drg-slider-bar:nth-last-of-type(even),
+drg-slider [drg-slider-bar]:nth-last-of-type(even),
+[drg-slider] drg-slider-bar:nth-last-of-type(even),
+[drg-slider] [drg-slider-bar]:nth-last-of-type(even) {
+  background-color: #2e3974;
+}
+
+/* line 103, stdin */
+drg-slider drg-slider-bar:nth-last-of-type(even):hover,
+drg-slider drg-slider-bar:nth-last-of-type(even):focus,
+drg-slider drg-slider-bar:nth-last-of-type(even).active,
+drg-slider [drg-slider-bar]:nth-last-of-type(even):hover,
+drg-slider [drg-slider-bar]:nth-last-of-type(even):focus,
+drg-slider [drg-slider-bar]:nth-last-of-type(even).active,
+[drg-slider] drg-slider-bar:nth-last-of-type(even):hover,
+[drg-slider] drg-slider-bar:nth-last-of-type(even):focus,
+[drg-slider] drg-slider-bar:nth-last-of-type(even).active,
+[drg-slider] [drg-slider-bar]:nth-last-of-type(even):hover,
+[drg-slider] [drg-slider-bar]:nth-last-of-type(even):focus,
+[drg-slider] [drg-slider-bar]:nth-last-of-type(even).active {
+  background-color: #181e3d;
+}
+
+/* line 110, stdin */
+drg-slider drg-slider-bar:hover,
+drg-slider drg-slider-bar:focus,
+drg-slider drg-slider-bar.active,
+drg-slider [drg-slider-bar]:hover,
+drg-slider [drg-slider-bar]:focus,
+drg-slider [drg-slider-bar].active,
+[drg-slider] drg-slider-bar:hover,
+[drg-slider] drg-slider-bar:focus,
+[drg-slider] drg-slider-bar.active,
+[drg-slider] [drg-slider-bar]:hover,
+[drg-slider] [drg-slider-bar]:focus,
+[drg-slider] [drg-slider-bar].active {
+  cursor: pointer;
+}

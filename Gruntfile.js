@@ -4,9 +4,9 @@ module.exports = function(grunt) {
 		pkg:      grunt.file.readJSON('package.json'),
 		srcFiles: {
 			js:   [
-				'src/js/angular-slider_app.js',
-				'src/js/angular-slider_directives.js',
-				'src/js/angular-slider_controllers.js'
+				'src/js/app.js',
+				'src/js/directive.js',
+				'src/js/controller.js'
 			],
 			less: {
 				base: [

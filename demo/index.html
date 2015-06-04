@@ -2,18 +2,18 @@
 <html>
 <head>
     <title>Slider for AngularJS</title>
-    <link rel="stylesheet" href="angular-slider.tmpl.simple.css" />
+    <link rel="stylesheet" href="../build/css/drg-slider.simple.tpl.css" />
 	<style type="text/css">
-		.ng-slider {
+		drg-slider {
 			margin-bottom: 25px;
 		}
 
-		.ng-slider .ng-slider-knob span {
+		drg-slider drg-slider-knob span {
 			position:  absolute;
 			font-size: 11px;
 		}
 
-		.ng-slider.ng-slider-horizontal .ng-slider-knob span {
+		drg-slider.drg-slider-horizontal drg-slider-knob span {
 			top:         100%;
 			width:       200%;
 			left:        -50%;
@@ -21,17 +21,17 @@
 			line-height: 18px;;
 		}
 
-		.ng-slider.ng-slider-vertical .ng-slider-knob span {
+		drg-slider.drg-slider-vertical drg-slider-knob span {
 			top:         0;
 			left:        120%;
 			line-height: 16px;
 		}
 
-		.ng-slider .ng-slider-bar:nth-child(even) {
+		drg-slider drg-slider-bar:nth-child(even) {
 			opacity: 0.6;
 		}
 
-		.ng-slider .ng-slider-bar:nth-child(odd) {
+		drg-slider drg-slider-bar:nth-child(odd) {
 			opacity: 0.3;
 		}
 	</style>
@@ -39,29 +39,31 @@
 <body id='ng-app' ng-app="ExampleApp">
 
 	<div class='slider-container' ng-controller="MainCtrl">
-		<ng-slider floor="{{min}}" ceiling="{{max}}" ng-slider-options="options">
-			<ng-slider-knob ng-model="values.low">
+		<drg-slider floor="{{min}}" ceiling="{{max}}" drg-slider-options="options">
+			<drg-slider-knob ng-model="values.low">
 				<span>{{ $viewValue }}</span>
-			</ng-slider-knob>
-			<ng-slider-knob ng-model="values.high">
+			</drg-slider-knob>
+			<drg-slider-knob ng-model="values.high">
 				<span>{{ $viewValue }}</span>
-			</ng-slider-knob>
-			<ng-slider-knob ng-model="value">
+			</drg-slider-knob>
+			<drg-slider-knob ng-model="value">
 				<span>{{ $viewValue }}</span>
-			</ng-slider-knob>
-			<ng-slider-knob ng-model="value2">
+			</drg-slider-knob>
+			<drg-slider-knob ng-model="value2">
 				<span>{{ $viewValue }}</span>
-			</ng-slider-knob>
-		</ng-slider>
+			</drg-slider-knob>
+		</drg-slider>
 		<input type="text" ng-model="values.high" />
 		<input type="text" ng-model="values.low" />
 		<input type="text" ng-model="value" />
 		<input type="text" ng-model="value2" /><br />
 		<input type="text" ng-model="min" />
-		<input type="text" ng-model="max" />
+		<input type="text" ng-model="max" /><br />
+		<input type="checkbox" name="vertical" id="vertical" ng-model="options.vertical"/>
+		<label for="vertical">Vertical</label>
     </div>
-	<script src="//ajax.googleapis.com/ajax/libs/angularjs/1.2.21/angular.min.js"></script>
-    <script src="angular-slider.js"></script>
+	<script src="../bower_components/angular/angular.min.js"></script>
+    <script src="../build/js/drg-slider.js"></script>
     <script>
 	    function dump(obj) {
 		    var out = '';
@@ -71,7 +73,7 @@
 
 		    return out;
 	    }
-	    angular.module('ExampleApp', ['vr.directives.slider']).controller('MainCtrl', ['$scope', function($scope) {
+	    angular.module('ExampleApp', ['drg.slider']).controller('MainCtrl', ['$scope', function($scope) {
 		    $scope.scopes = [];
 		    $scope.value = 20;
 		    $scope.value2 = 90;
@@ -88,7 +90,8 @@
 			    },
 			    buffer:    1,
 			    steps:     13,
-			    precision: 2
+			    precision: 2,
+				vertical: true
 		    };
 		    $scope.scale = function(value) {
 			    return Math.pow(value, 3);

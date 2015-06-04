@@ -1,6 +1,6 @@
 {
   "name": "angular-slider",
-  "version": "1.0.0-beta.1",
+  "version": "1.0.0-alpha.1",
   "description": "Slider directive for AngularJS.",
   "main": "",
   "scripts": {
@@ -13,16 +13,21 @@
   "author": "Derek Gould",
   "license": "MIT",
   "devDependencies": {
-    "karma": "*",
-    "karma-jasmine": "^0.2.2",
-    "karma-phantomjs-launcher": "*",
-    "karma-firefox-launcher": "*",
-    "grunt": "*",
-    "grunt-contrib-uglify": "*",
-    "grunt-contrib-concat": "*",
-    "grunt-contrib-less": "*",
-    "grunt-contrib-watch": "*",
-    "grunt-karma": "^0.8.3",
-    "load-grunt-tasks": "^0.6.0"
+    "gulp": "^3.9.0",
+    "gulp-babel": "^5.1.0",
+    "gulp-concat": "^2.5.2",
+    "gulp-minify-css": "^1.1.5",
+    "gulp-ng-annotate": "^1.0.0",
+    "gulp-rename": "^1.2.2",
+    "gulp-sass": "^2.0.1",
+    "gulp-sourcemaps": "^1.5.2",
+    "gulp-sync": "^0.1.4",
+    "gulp-uglify": "^1.2.0",
+    "jasmine-core": "^2.3.4",
+    "karma": "^0.12.35",
+    "karma-jasmine": "^0.3.5",
+    "karma-phantomjs-launcher": "^0.2.0",
+    "lodash": "^3.9.3",
+    "phantomjs": "^1.9.17"
   }
 }

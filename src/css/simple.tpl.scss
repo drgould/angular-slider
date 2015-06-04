@@ -1,0 +1,114 @@
+@import "drg-slider";
+
+$bar-height: 10px;
+$bar-width: 500px;
+$bar-border-size: 1px;
+$knob-size: 16px;
+$knob-border-size: 1px;
+
+$background-color: #EEEEEE;
+$border-color: #DDDDDD;
+
+$bar-color-even: #2e3974;
+$bar-color-odd: #f56b3a;
+
+$knob-background-color: #ccc;
+$knob-border-color: #aaa;
+
+drg-slider,
+[drg-slider] {
+    background-color: $background-color;
+    border:           $bar-border-size solid $border-color;
+    margin:           ($knob-size - $bar-height)/2 0;
+    border-radius:    $bar-height/2;
+
+    &.drg-slider-horizontal {
+        width:  $bar-width;
+        height: $bar-height;
+
+        drg-slider-knob,
+        [drg-slider-knob] {
+            top: (($knob-size - $bar-height)/-2) - 1px !important;
+        }
+
+        drg-slider-bar,
+        [drg-slider-bar] {
+            top: 0 !important;
+            height: 100% !important;
+
+            &:first-of-type {
+                border-radius: $bar-height/2 0 0 $bar-height/2;
+            }
+            &:last-of-type {
+                border-radius: 0 $bar-height/2 $bar-height/2 0;
+            }
+        }
+    }
+    &.drg-slider-vertical {
+        width:  $bar-height;
+        height: $bar-width;
+
+        drg-slider-knob,
+        [drg-slider-knob] {
+            left: (($knob-size - $bar-height)/-2) - 1px !important;
+        }
+
+        drg-slider-bar,
+        [drg-slider-bar] {
+            left: 0 !important;
+            width: 100% !important;
+
+            &:first-of-type {
+                border-radius: $bar-height/2 $bar-height/2 0 0;
+            }
+            &:last-of-type {
+                border-radius: 0 0 $bar-height/2 $bar-height/2;
+            }
+        }
+    }
+
+    drg-slider-knob,
+    [drg-slider-knob] {
+        height:           $knob-size;
+        width:            $knob-size;
+        background-color: $knob-background-color;
+        border:           $knob-border-size solid $knob-border-color;
+        border-radius:    $knob-size/2;
+
+        &:hover,
+        &:focus,
+        &.active {
+            background-color: darken( $knob-background-color, 15% );
+            border-color:     darken( $knob-border-color, 15% );
+            cursor:           pointer;
+        }
+    }
+
+    drg-slider-bar,
+    [drg-slider-bar] {
+        &:nth-last-of-type(odd) {
+            background-color: $bar-color-odd;
+
+            &:hover,
+            &:focus,
+            &.active {
+                background-color: darken( $bar-color-odd, 15% );
+            }
+        }
+        &:nth-last-of-type(even) {
+            background-color: $bar-color-even;
+
+            &:hover,
+            &:focus,
+            &.active {
+                background-color: darken( $bar-color-even, 15% );
+            }
+        }
+
+        &:hover,
+        &:focus,
+        &.active {
+            cursor: pointer;
+        }
+    }
+}

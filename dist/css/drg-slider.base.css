@@ -1,0 +1,35 @@
+/* line 2, stdin */
+drg-slider,
+[drg-slider] {
+  position: relative;
+  display: block;
+}
+
+/* line 6, stdin */
+drg-slider,
+drg-slider *,
+[drg-slider], [drg-slider] * {
+  box-sizing: border-box;
+}
+
+/* line 11, stdin */
+drg-slider drg-slider-knob,
+drg-slider [drg-slider-knob],
+[drg-slider] drg-slider-knob,
+[drg-slider] [drg-slider-knob] {
+  position: absolute;
+  display: block;
+  -ms-touch-action: none;
+  touch-action: none;
+}
+
+/* line 19, stdin */
+drg-slider drg-slider-bar,
+drg-slider [drg-slider-bar],
+[drg-slider] drg-slider-bar,
+[drg-slider] [drg-slider-bar] {
+  position: absolute;
+  display: block;
+  -ms-touch-action: none;
+  touch-action: none;
+}
