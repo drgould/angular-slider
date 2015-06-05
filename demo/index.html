@@ -60,7 +60,14 @@
 		<input type="text" ng-model="min" />
 		<input type="text" ng-model="max" /><br />
 		<input type="checkbox" name="vertical" id="vertical" ng-model="options.vertical"/>
-		<label for="vertical">Vertical</label>
+		<label for="vertical">Vertical</label><br />
+        <input type="checkbox" name="continuous" id="continuous" ng-model="options.continuous"/>
+        <label for="continuous">Continuous</label><br />
+        <label for="spacing">Spacing:</label>
+        <select name="spacing" id="spacing" ng-model="options.spacing">
+            <option value="equal">Equal</option>
+            <option value="relative">Relative</option>
+        </select>
     </div>
 	<script src="../bower_components/angular/angular.min.js"></script>
     <script src="../build/js/drg-slider.js"></script>
@@ -85,13 +92,13 @@
 		    $scope.min = 0;
 
 		    $scope.options = {
-			    translate: function(value) {
-				    return '$' + value;
-			    },
 			    buffer:    1,
 			    steps:     13,
 			    precision: 2,
-				vertical: true
+				vertical: false,
+                continuous: false,
+				values: [ 0, 10, 30, 60, 65, 75, 99 ],
+                spacing: 'equal'
 		    };
 		    $scope.scale = function(value) {
 			    return Math.pow(value, 3);

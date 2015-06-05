@@ -5,14 +5,11 @@
   "ignore": [
     ".*",
     "**/.*",
-    "node_modules",
-    "bower_components",
-    "lib",
     "src",
-    "test",
-    "Gruntfile.js",
+    "demo",
+    "gulpfile.js",
     "karma.conf.js",
-    "*.html"
+    "package.json"
   ],
   "dependencies": {
     "angular": "~1.3.*"

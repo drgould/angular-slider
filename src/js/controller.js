@@ -1,6 +1,9 @@
 angular.module( 'drg.slider' )
     .controller( 'SliderCtrl', function ( $scope, $timeout ) {
 
+        var SPACING_EQUAL = 'equal';
+        var SPACING_RELATIVE = 'relative';
+
         // keep track of the registered knobs
         $scope.knobs = [];
 
@@ -20,11 +23,8 @@ angular.module( 'drg.slider' )
             precision : 0,
             buffer : 0,
             steps : 0,
-            addStepNumbers : false,
-            stickiness : 3,
-            scale : function ( val ) {
-                return val;
-            },
+            values : [],
+            spacing : SPACING_RELATIVE, // how to space the notches on the slider "relative" or "equal"
             continuous : false,
             vertical : false
         };
@@ -39,12 +39,17 @@ angular.module( 'drg.slider' )
             return a_val > b_val ? 1 : (b_val > a_val ? -1 : 0);
         }
 
+        function sortKnobs() {
+            console.log( 'sortKnobs' );
+            $scope.knobs.sort( knobSort );
+        }
+
         /**
          * Sort the knobs by model value
          */
         function updateKnobs() {
-            $scope.knobs.sort( knobSort );
-            angular.forEach( $scope.knobs, function( knob ) {
+            sortKnobs();
+            angular.forEach( $scope.knobs, function ( knob ) {
                 knob.ngModel.$modelValue = Math.max( $scope.floor, Math.min( knob.ngModel.$modelValue, $scope.ceiling ) );
             } );
         }
@@ -131,13 +136,83 @@ angular.module( 'drg.slider' )
             } );
         }
 
+        var fixDebounce;
+
         /**
          * Call this to refresh the slider
          */
         $scope.fix = function () {
-            updateKnobs();
-            updateBars();
+            $timeout.cancel( fixDebounce );
+            fixDebounce = $timeout( function() {
+                updateKnobs();
+                updateBars();
+            }, 25 );
         };
+
+        /**
+         * Find the nearest value in the list of values
+         * @param position {number}
+         * @param [floor] {number}
+         * @param [ceiling] {number}
+         * @param [isValue] {boolean}
+         * @param [values] {number[]}
+         * @returns {number|undefined}
+         */
+        function nearestValue( position, floor=$scope.floor, ceiling=$scope.ceiling, isValue=false, values=ctrl.options.values ) {
+            if( ctrl.isEqualSpacing() && !isValue ) {
+                // using equal spacing strategy
+                var percent = ( position - $scope.floor ) / ( $scope.ceiling - $scope.floor );
+                var index = Math.round( percent * ( values.length - 1 ) );
+
+                while( index >= 0 && index < values.length ) {
+                    if( values[ index ] < floor ) {
+                        if( values[ index + 1 ] > ceiling ) {
+                            console.warn( 'Raise your roof!', position, values[ index ], values[ index + 1 ], ceiling );
+                            return undefined;
+                        }
+                        index++;
+                    } else if( values[ index ] > ceiling ) {
+                        if( values[ index - 1 ] < floor ) {
+                            console.warn( 'You\'re giving me vertigo!', position, values[ index - 1 ], values[ index ], floor );
+                            return undefined;
+                        }
+                        index--;
+                    } else {
+                        return values[ index ];
+                    }
+                }
+
+                console.warn( 'I don\'t fit anywhere :(', position, $scope.knobs.map( knob => knob.ngModel.$modelValue ), values, floor, ceiling );
+                return undefined;
+            }
+
+            // using relative spacing strategy
+            for( var i = 0; i < values.length - 1; i++ ) {
+                // find where the value fits in
+                if( position >= values[ i ] && position <= values[ i + 1 ]  ) {
+                    if( values[ i ] < floor && values[ i + 1 ] > ceiling ) {
+                        console.warn( 'BOONDOGGLE!', position, values[ i ], values[ i + 1 ], floor, ceiling );
+                        return undefined;
+                    } else if( values[ i ] < floor ) {
+                        console.debug( 'below floor', values[ i + 1 ] );
+                        return values[ i + 1 ];
+                    } else if( values[ i + 1 ] > ceiling ) {
+                        console.debug( 'above ceiling', values[ i ] );
+                        return values[ i ];
+                    }
+
+                    // and return the nearest value
+                    return values[ i + Math.round( ( position - values[ i ] ) / ( values[ i + 1 ] - values[ i ] ) ) ];
+                }
+            }
+
+            if( values[ values.length - 1 ] > ceiling ) {
+                console.warn( 'Tsk tsk!', position, values[ values.length - 1 ], ceiling );
+                return undefined;
+            }
+            // the value doesn't fit anywhere so just return the max value
+            return values[ values.length - 1 ];
+        }
 
         /**
          * Convert a value to the correct percentage for display purposes
@@ -158,8 +233,31 @@ angular.module( 'drg.slider' )
             // compute the percentage size of the knob
             var knobPercent = knobSize / $scope.dimensions().sliderSize * 100;
 
-            // compute the percent offset of the knob taking into account he size of the knob
-            var percent = ( ( ( parseFloat( value ) - $scope.floor ) / ( $scope.ceiling - $scope.floor ) ) * ( 100 - knobPercent ) );
+            var percent = 1;
+
+            value = parseFloat( value );
+
+            if( ctrl.useValues() ) {
+                var values = ctrl.options.values;
+
+                for ( var i = 0; i < values.length - 1; i++ ) {
+                    // find where the value fits in
+                    if ( value >= values[ i ] && value <= values[ i + 1 ] ) {
+                        // and compute the relative percent
+                        var index = i + Math.round( ( value - values[ i ] ) / ( values[ i + 1 ] - values[ i ] ) );
+                        if( ctrl.isEqualSpacing() ) {
+                            percent = index / ( values.length - 1 );
+                        } else {
+                            percent = ( values[ index ] - $scope.floor ) / ( $scope.ceiling - $scope.floor );
+                        }
+                    }
+                }
+            } else {
+                percent = ( value - $scope.floor ) / ( $scope.ceiling - $scope.floor );
+            }
+
+            // compute the percent offset of the knob taking into account the size of the knob
+            percent = percent * ( 100 - knobPercent );
 
             if ( bar && knob ) {
                 // we're computing this for a bar and we've been given a knob, add half of the knob back to keep the bar in the middle of the knob
@@ -167,6 +265,35 @@ angular.module( 'drg.slider' )
             }
 
             return percent;
+        };
+
+        /**
+         * Convert a percentage to a value
+         * @param percent {number}
+         * @param [floor] {number}
+         * @param [ceiling] {number}
+         * @returns {number}
+         */
+        this.percentToValue = function ( percent, floor=$scope.floor, ceiling=$scope.ceiling ) {
+            // compute the relative value
+            var value = ( percent * ( ceiling - floor ) ) + floor;
+
+            if( ctrl.useValues() ) {
+                // we have some specific values
+                return nearestValue( value, floor, ceiling );
+            }
+
+            // no specific values have been specified so just return the relative value
+            return value;
+        };
+
+        /**
+         * Compute the percent from the given value
+         * @param value {number}
+         * @returns {number}
+         */
+        this.toPercent = function( value ) {
+            return ( value - $scope.floor ) / ( $scope.ceiling - $scope.floor );
         };
 
         /**
@@ -181,6 +308,7 @@ angular.module( 'drg.slider' )
 
             // add the knob to the list
             $scope.knobs.push( knob );
+            sortKnobs();
 
             /**
              * Normalize the value so it adheres to these criteria:
@@ -192,6 +320,7 @@ angular.module( 'drg.slider' )
              * @param value {number}
              */
             function normalizeModel( value ) {
+                sortKnobs();
 
                 // initialize the bounds
                 var ceiling = $scope.ceiling;
@@ -216,7 +345,10 @@ angular.module( 'drg.slider' )
                     }
                 }
 
-                if ( ctrl.options.steps > 1 ) {
+                if( ctrl.useValues() ) {
+                    // a specific set of values has been specified
+                    normalized = nearestValue( value, floor, ceiling, true );
+                } else if ( ctrl.options.steps > 1 ) {
                     // there should be more than one step
 
                     // get the width of a step
@@ -293,13 +425,6 @@ angular.module( 'drg.slider' )
                 update( value );
             } );
 
-            // watch for updates on the slider and update accordingly
-            //$scope.$watch( 'floor', function () {
-            //    update( knob.ngModel.$modelValue );
-            //} );
-            //$scope.$watch( 'ceiling', function () {
-            //    update( knob.ngModel.$modelValue );
-            //} );
             $scope.$watch( function () {
                 return ctrl.options;
             }, function () {
@@ -376,5 +501,10 @@ angular.module( 'drg.slider' )
                     }
                 }
             }
-        }
+        };
+
+        this.isEqualSpacing = () => this.options.spacing === SPACING_EQUAL;
+        this.isRelativeSpacing = () => this.options.spacing === SPACING_RELATIVE;
+
+        this.useValues = () => ctrl.options.values.length > 1;
     } );

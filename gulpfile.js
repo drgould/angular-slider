@@ -6,6 +6,7 @@ var path = require( 'path' );
 var gulp = require( 'gulp' );
 var sync = require( 'gulp-sync' )( gulp ).sync;
 var rename = require( 'gulp-rename' );
+var replace = require( 'gulp-replace' );
 
 var concat = require( 'gulp-concat' );
 var sourcemaps = require( 'gulp-sourcemaps' );
@@ -13,6 +14,7 @@ var sourcemaps = require( 'gulp-sourcemaps' );
 var uglify = require( 'gulp-uglify' );
 var babel = require( 'gulp-babel' );
 var ngannotate = require( 'gulp-ng-annotate' );
+var stripdebug = require( 'gulp-strip-debug' );
 
 var sass = require( 'gulp-sass' );
 var minifyCss = require( 'gulp-minify-css' );
@@ -132,6 +134,7 @@ function jsFiles() {
 
 gulp.task( 'compile-js', function() {
     return gulp.src( jsFiles() )
+        .pipe( replace( '{{version}}', pkg.version ) )
         .pipe( sourcemaps.init() )
         .pipe( babel() )
         .pipe( ngannotate() )
@@ -142,17 +145,13 @@ gulp.task( 'compile-js', function() {
 
 gulp.task( 'uglify-js', function() {
     return gulp.src( jsFiles() )
+        .pipe( replace( '{{version}}', pkg.version ) )
         .pipe( sourcemaps.init() )
+        .pipe( stripdebug() )
         .pipe( babel() )
         .pipe( ngannotate() )
         .pipe( concat( 'drg-slider.min.js' ) )
-        .pipe( uglify( {
-            banner : '/*\n' +
-                     ' ' + pkg.name + ' v' + pkg.version + ' \n' +
-                     ' (c) 2015 Derek Gould http://github.com/drgould \n' +
-                     ' License: MIT \n' +
-                     '*/\n'
-        } ) )
+        .pipe( uglify( { preserveComments : 'some' } ) )
         .pipe( sourcemaps.write( '.' ) )
         .pipe( gulp.dest( jsDestDir() ) );
 } );
