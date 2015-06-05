@@ -1,3 +1,9 @@
+/**
+ * angular-slider
+ * @version 1.0.0-alpha.1
+ * @copyright Derek Gould 2015
+ * @license MIT
+ */
 'use strict';
 
 angular.module('drg.slider', []);
@@ -89,6 +95,10 @@ angular.module('drg.slider').directive('drgSliderBar', function () {
 'use strict';
 
 angular.module('drg.slider').controller('SliderCtrl', ["$scope", "$timeout", function ($scope, $timeout) {
+    var _this = this;
+
+    var SPACING_EQUAL = 'equal';
+    var SPACING_RELATIVE = 'relative';
 
     // keep track of the registered knobs
     $scope.knobs = [];
@@ -109,11 +119,8 @@ angular.module('drg.slider').controller('SliderCtrl', ["$scope", "$timeout", fun
         precision: 0,
         buffer: 0,
         steps: 0,
-        addStepNumbers: false,
-        stickiness: 3,
-        scale: function scale(val) {
-            return val;
-        },
+        values: [],
+        spacing: SPACING_RELATIVE, // how to space the notches on the slider "relative" or "equal"
         continuous: false,
         vertical: false
     };
@@ -128,11 +135,16 @@ angular.module('drg.slider').controller('SliderCtrl', ["$scope", "$timeout", fun
         return a_val > b_val ? 1 : b_val > a_val ? -1 : 0;
     }
 
+    function sortKnobs() {
+        console.log('sortKnobs');
+        $scope.knobs.sort(knobSort);
+    }
+
     /**
      * Sort the knobs by model value
      */
     function updateKnobs() {
-        $scope.knobs.sort(knobSort);
+        sortKnobs();
         angular.forEach($scope.knobs, function (knob) {
             knob.ngModel.$modelValue = Math.max($scope.floor, Math.min(knob.ngModel.$modelValue, $scope.ceiling));
         });
@@ -220,13 +232,90 @@ angular.module('drg.slider').controller('SliderCtrl', ["$scope", "$timeout", fun
         });
     }
 
+    var fixDebounce;
+
     /**
      * Call this to refresh the slider
      */
     $scope.fix = function () {
-        updateKnobs();
-        updateBars();
+        $timeout.cancel(fixDebounce);
+        fixDebounce = $timeout(function () {
+            updateKnobs();
+            updateBars();
+        }, 25);
     };
+
+    /**
+     * Find the nearest value in the list of values
+     * @param position {number}
+     * @param [floor] {number}
+     * @param [ceiling] {number}
+     * @param [isValue] {boolean}
+     * @param [values] {number[]}
+     * @returns {number|undefined}
+     */
+    function nearestValue(position) {
+        var floor = arguments[1] === undefined ? $scope.floor : arguments[1];
+        var ceiling = arguments[2] === undefined ? $scope.ceiling : arguments[2];
+        var isValue = arguments[3] === undefined ? false : arguments[3];
+        var values = arguments[4] === undefined ? ctrl.options.values : arguments[4];
+
+        if (ctrl.isEqualSpacing() && !isValue) {
+            // using equal spacing strategy
+            var percent = (position - $scope.floor) / ($scope.ceiling - $scope.floor);
+            var index = Math.round(percent * (values.length - 1));
+
+            while (index >= 0 && index < values.length) {
+                if (values[index] < floor) {
+                    if (values[index + 1] > ceiling) {
+                        console.warn('Raise your roof!', position, values[index], values[index + 1], ceiling);
+                        return undefined;
+                    }
+                    index++;
+                } else if (values[index] > ceiling) {
+                    if (values[index - 1] < floor) {
+                        console.warn('You\'re giving me vertigo!', position, values[index - 1], values[index], floor);
+                        return undefined;
+                    }
+                    index--;
+                } else {
+                    return values[index];
+                }
+            }
+
+            console.warn('I don\'t fit anywhere :(', position, $scope.knobs.map(function (knob) {
+                return knob.ngModel.$modelValue;
+            }), values, floor, ceiling);
+            return undefined;
+        }
+
+        // using relative spacing strategy
+        for (var i = 0; i < values.length - 1; i++) {
+            // find where the value fits in
+            if (position >= values[i] && position <= values[i + 1]) {
+                if (values[i] < floor && values[i + 1] > ceiling) {
+                    console.warn('BOONDOGGLE!', position, values[i], values[i + 1], floor, ceiling);
+                    return undefined;
+                } else if (values[i] < floor) {
+                    console.debug('below floor', values[i + 1]);
+                    return values[i + 1];
+                } else if (values[i + 1] > ceiling) {
+                    console.debug('above ceiling', values[i]);
+                    return values[i];
+                }
+
+                // and return the nearest value
+                return values[i + Math.round((position - values[i]) / (values[i + 1] - values[i]))];
+            }
+        }
+
+        if (values[values.length - 1] > ceiling) {
+            console.warn('Tsk tsk!', position, values[values.length - 1], ceiling);
+            return undefined;
+        }
+        // the value doesn't fit anywhere so just return the max value
+        return values[values.length - 1];
+    }
 
     /**
      * Convert a value to the correct percentage for display purposes
@@ -247,8 +336,31 @@ angular.module('drg.slider').controller('SliderCtrl', ["$scope", "$timeout", fun
         // compute the percentage size of the knob
         var knobPercent = knobSize / $scope.dimensions().sliderSize * 100;
 
-        // compute the percent offset of the knob taking into account he size of the knob
-        var percent = (parseFloat(value) - $scope.floor) / ($scope.ceiling - $scope.floor) * (100 - knobPercent);
+        var percent = 1;
+
+        value = parseFloat(value);
+
+        if (ctrl.useValues()) {
+            var values = ctrl.options.values;
+
+            for (var i = 0; i < values.length - 1; i++) {
+                // find where the value fits in
+                if (value >= values[i] && value <= values[i + 1]) {
+                    // and compute the relative percent
+                    var index = i + Math.round((value - values[i]) / (values[i + 1] - values[i]));
+                    if (ctrl.isEqualSpacing()) {
+                        percent = index / (values.length - 1);
+                    } else {
+                        percent = (values[index] - $scope.floor) / ($scope.ceiling - $scope.floor);
+                    }
+                }
+            }
+        } else {
+            percent = (value - $scope.floor) / ($scope.ceiling - $scope.floor);
+        }
+
+        // compute the percent offset of the knob taking into account the size of the knob
+        percent = percent * (100 - knobPercent);
 
         if (bar && knob) {
             // we're computing this for a bar and we've been given a knob, add half of the knob back to keep the bar in the middle of the knob
@@ -256,6 +368,38 @@ angular.module('drg.slider').controller('SliderCtrl', ["$scope", "$timeout", fun
         }
 
         return percent;
+    };
+
+    /**
+     * Convert a percentage to a value
+     * @param percent {number}
+     * @param [floor] {number}
+     * @param [ceiling] {number}
+     * @returns {number}
+     */
+    this.percentToValue = function (percent) {
+        var floor = arguments[1] === undefined ? $scope.floor : arguments[1];
+        var ceiling = arguments[2] === undefined ? $scope.ceiling : arguments[2];
+
+        // compute the relative value
+        var value = percent * (ceiling - floor) + floor;
+
+        if (ctrl.useValues()) {
+            // we have some specific values
+            return nearestValue(value, floor, ceiling);
+        }
+
+        // no specific values have been specified so just return the relative value
+        return value;
+    };
+
+    /**
+     * Compute the percent from the given value
+     * @param value {number}
+     * @returns {number}
+     */
+    this.toPercent = function (value) {
+        return (value - $scope.floor) / ($scope.ceiling - $scope.floor);
     };
 
     /**
@@ -270,6 +414,7 @@ angular.module('drg.slider').controller('SliderCtrl', ["$scope", "$timeout", fun
 
         // add the knob to the list
         $scope.knobs.push(knob);
+        sortKnobs();
 
         /**
          * Normalize the value so it adheres to these criteria:
@@ -281,6 +426,7 @@ angular.module('drg.slider').controller('SliderCtrl', ["$scope", "$timeout", fun
          * @param value {number}
          */
         function normalizeModel(value) {
+            sortKnobs();
 
             // initialize the bounds
             var ceiling = $scope.ceiling;
@@ -305,7 +451,10 @@ angular.module('drg.slider').controller('SliderCtrl', ["$scope", "$timeout", fun
                 }
             }
 
-            if (ctrl.options.steps > 1) {
+            if (ctrl.useValues()) {
+                // a specific set of values has been specified
+                normalized = nearestValue(value, floor, ceiling, true);
+            } else if (ctrl.options.steps > 1) {
                 // there should be more than one step
 
                 // get the width of a step
@@ -382,13 +531,6 @@ angular.module('drg.slider').controller('SliderCtrl', ["$scope", "$timeout", fun
             update(value);
         });
 
-        // watch for updates on the slider and update accordingly
-        //$scope.$watch( 'floor', function () {
-        //    update( knob.ngModel.$modelValue );
-        //} );
-        //$scope.$watch( 'ceiling', function () {
-        //    update( knob.ngModel.$modelValue );
-        //} );
         $scope.$watch(function () {
             return ctrl.options;
         }, function () {
@@ -466,6 +608,17 @@ angular.module('drg.slider').controller('SliderCtrl', ["$scope", "$timeout", fun
             }
         };
     };
+
+    this.isEqualSpacing = function () {
+        return _this.options.spacing === SPACING_EQUAL;
+    };
+    this.isRelativeSpacing = function () {
+        return _this.options.spacing === SPACING_RELATIVE;
+    };
+
+    this.useValues = function () {
+        return ctrl.options.values.length > 1;
+    };
 }]);
 'use strict';
 
@@ -474,252 +627,264 @@ angular.module('drg.slider').directive('drgSlider', ["$document", "$compile", "$
         restrict: 'EA',
         controller: 'SliderCtrl',
         scope: true,
-        compile: function compile(elem, attr) {
-            // check requirements
-            if (angular.isUndefined(attr.floor)) {
-                throw 'ngSlider Error: Floor not specified';
-            }
-            if (angular.isUndefined(attr.ceiling)) {
-                throw 'ngSlider Error: Ceiling not specified';
+        link: function link(scope, elem, attr, ctrl) {
+
+            /**
+             * Get the current relative position of the cursor at the given index
+             * @param ev {Event}
+             * @param index {number}
+             * @returns {number}
+             */
+            function cursorPosition(ev, index) {
+                var position = -1 * scope.dimensions().sliderOffset;
+                if (ctrl.options.vertical) {
+                    position += ev.touches ? ev.touches[index].pageY : ev.pageY;
+                } else {
+                    position += ev.touches ? ev.touches[index].pageX : ev.pageX;
+                }
+                return position;
             }
 
-            return function (scope, elem, attr, ctrl) {
+            /**
+             * Get the current position of the given knob
+             * @param knob {angular.element}
+             * @returns {number}
+             */
+            function knobPosition(knob) {
+                var offset = ctrl.options.vertical ? knob[0].offsetTop : knob[0].offsetLeft;
+                return offset - scope.dimensions().sliderOffset;
+            }
 
-                /**
-                 * Get the current relative position of the cursor at the given index
-                 * @param ev {Event}
-                 * @param index {number}
-                 * @returns {number}
-                 */
-                function cursorPosition(ev, index) {
-                    var position = -1 * scope.dimensions().sliderOffset;
-                    if (ctrl.options.vertical) {
-                        position += ev.touches ? ev.touches[index].pageY : ev.pageY;
-                    } else {
-                        position += ev.touches ? ev.touches[index].pageX : ev.pageX;
-                    }
-                    return position;
+            // add the bars
+            elem.prepend($compile('<drg-slider-bar low="' + $interpolate.startSymbol() + ' bar.low() ' + $interpolate.endSymbol() + '" high="' + $interpolate.startSymbol() + ' bar.high() ' + $interpolate.endSymbol() + '" ng-repeat="bar in bars"></ng-slider-bar>')(scope));
+
+            /**
+             * Get the current slider size and offset
+             * @returns {{sliderSize: number, sliderOffset: number}}
+             */
+            scope.dimensions = function () {
+                // get the offset for the slider
+                var offset = ctrl.options.vertical ? elem[0].offsetTop : elem[0].offsetLeft;
+
+                if (elem[0].offsetParent) {
+                    // take into account the offset of this element's parent
+                    offset += ctrl.options.vertical ? elem[0].offsetParent.offsetTop : elem[0].offsetParent.offsetLeft;
                 }
 
-                /**
-                 * Get the current position of the given knob
-                 * @param knob {angular.element}
-                 * @returns {number}
-                 */
-                function knobPosition(knob) {
-                    var offset = ctrl.options.vertical ? knob[0].offsetTop : knob[0].offsetLeft;
-                    return offset - scope.dimensions().sliderOffset;
+                return {
+                    sliderSize: ctrl.options.vertical ? elem[0].offsetHeight : elem[0].offsetWidth, // get the size of the slider
+                    sliderOffset: offset
+                };
+            };
+
+            /**
+             * What to do when the user starts sliding
+             * @param ev {Event}
+             */
+            scope.onStart = function (ev) {
+                // get the index of the touch/mouse
+                var index = 0;
+                if (ev.targetTouches) {
+                    index = ev.targetTouches[0].identifier;
                 }
 
-                // add the bars
-                elem.prepend($compile('<drg-slider-bar low="' + $interpolate.startSymbol() + ' bar.low() ' + $interpolate.endSymbol() + '" high="' + $interpolate.startSymbol() + ' bar.high() ' + $interpolate.endSymbol() + '" ng-repeat="bar in bars"></ng-slider-bar>')(scope));
+                // save the starting position(s)
+                if (angular.isArray(scope.currentKnobs[index]) && scope.currentKnobs[index].length > 1) {
+                    var cursorPos = cursorPosition(ev, index);
+                    scope.startOffsets[index] = scope.currentKnobs[index].map(function (knob) {
+                        return knobPosition(knob.elem) - cursorPos;
+                    });
+                } else {
+                    scope.startOffsets[index] = [0];
+                }
 
-                /**
-                 * Get the current slider size and offset
-                 * @returns {{sliderSize: number, sliderOffset: number}}
-                 */
-                scope.dimensions = function () {
-                    // get the offset for the slider
-                    var offset = ctrl.options.vertical ? elem[0].offsetTop : elem[0].offsetLeft;
+                // fire a "move"
+                scope.onMove(ev);
+            };
 
-                    if (elem[0].offsetParent) {
-                        // take into account the offset of this element's parent
-                        offset += ctrl.options.vertical ? elem[0].offsetParent.offsetTop : elem[0].offsetParent.offsetLeft;
-                    }
+            /**
+             * What to do when a knob is moved
+             * @param ev {Event}
+             */
+            scope.onMove = function (ev) {
+                // get the current dimensions
+                var dimensions = scope.dimensions();
 
-                    return {
-                        sliderSize: ctrl.options.vertical ? elem[0].offsetHeight : elem[0].offsetWidth, // get the size of the slider
-                        sliderOffset: offset
-                    };
-                };
+                angular.forEach(scope.currentKnobs, function (knobs, index) {
+                    if (scope.currentKnobs[index]) {
+                        // get the current mouse position
+                        var position = cursorPosition(ev, index);
 
-                /**
-                 * What to do when the user starts sliding
-                 * @param ev {Event}
-                 */
-                scope.onStart = function (ev) {
-                    // get the index of the touch/mouse
-                    var index = 0;
-                    if (ev.targetTouches) {
-                        index = ev.targetTouches[0].identifier;
-                    }
+                        var startOffsets = scope.startOffsets[index];
 
-                    // save the starting position(s)
-                    if (angular.isArray(scope.currentKnobs[index]) && scope.currentKnobs[index].length > 1) {
-                        var cursorPos = cursorPosition(ev, index);
-                        scope.startOffsets[index] = scope.currentKnobs[index].map(function (knob) {
-                            return knobPosition(knob.elem) - cursorPos;
-                        });
-                    } else {
-                        scope.startOffsets[index] = [0];
-                    }
+                        if (!angular.isArray(knobs)) {
+                            knobs = [knobs];
+                        }
 
-                    // fire a "move"
-                    scope.onMove(ev);
-                };
+                        // get the size of the knob(s) being dragged
+                        for (var i = 0; i < knobs.length; i++) {
+                            // get the size of the knob
+                            var knobSize = ctrl.options.vertical ? knobs[i].elem[0].offsetHeight : knobs[i].elem[0].offsetWidth;
 
-                /**
-                 * What to do when a knob is moved
-                 * @param ev {Event}
-                 */
-                scope.onMove = function (ev) {
-                    // get the current dimensions
-                    var dimensions = scope.dimensions();
+                            var min = 0;
+                            var max = 1;
 
-                    angular.forEach(scope.currentKnobs, function (knobs, index) {
-                        if (scope.currentKnobs[index]) {
-                            // get the current mouse position
-                            var position = cursorPosition(ev, index);
-
-                            var startOffsets = scope.startOffsets[index];
-
-                            if (!angular.isArray(knobs)) {
-                                knobs = [knobs];
-                            }
-
-                            // get the size of the knob(s) being dragged
-                            for (var i = 0; i < knobs.length; i++) {
-                                // get the size of the knob
-                                var knobSize = ctrl.options.vertical ? knobs[i].elem[0].offsetHeight : knobs[i].elem[0].offsetWidth;
-
-                                // get the current mouse/finger position as a percentage
-                                var percent = Math.max(0, Math.min((position + startOffsets[i] - knobSize / 2) / (dimensions.sliderSize - knobSize), 1));
-
-                                // compute the value from the percentage
-                                var value = (percent * (scope.ceiling - scope.floor) + scope.floor).toFixed(ctrl.options.precision);
-
-                                // update the model for the knob being dragged
-                                knobs[i].ngModel.$setViewValue(value);
-                                if (!scope.$$phase) {
-                                    scope.$apply();
+                            if (!ctrl.options.continuous) {
+                                var index = scope.knobs.indexOf(knobs[i]);
+                                if (index > 0) {
+                                    min = ctrl.toPercent(scope.knobs[index - 1].ngModel.$modelValue);
+                                }
+                                if (index < scope.knobs.length - 1) {
+                                    max = ctrl.toPercent(scope.knobs[index + 1].ngModel.$modelValue);
                                 }
                             }
-                        }
-                    });
-                };
 
-                /**
-                 * What to do when the slide is finished
-                 */
-                scope.onEnd = function (index) {
-                    // remove the knob from the list of knobs currently being dragged
-                    var knobs = scope.currentKnobs[index] || [];
-                    if (index < scope.currentKnobs.length) {
-                        delete scope.currentKnobs[index];
-                    }
+                            // get the current mouse/finger position as a percentage
+                            var percent = Math.max(min, Math.min((position + startOffsets[i] - knobSize / 2) / (dimensions.sliderSize - knobSize), max));
 
-                    if (!angular.isArray(knobs)) {
-                        knobs = [knobs];
-                    }
+                            // compute the value from the percentage
+                            var value = ctrl.percentToValue(percent).toFixed(ctrl.options.precision);
 
-                    angular.forEach(knobs, function (knob) {
-                        // fire the knob's onEnd callback
-                        knob.onEnd();
-                    });
-
-                    if (scope.currentKnobs.length == 0) {
-                        // we're no longer sliding
-                        scope.sliding = false;
-                    }
-                };
-
-                scope.onResize = function () {
-                    scope.fix();
-                };
-
-                // set the default events
-                var moveEvents = ['mousemove', 'touchmove'];
-                var cancelEvents = ['mousecancel', 'touchcancel'];
-                var endEvents = ['mouseup', 'touchend'];
-
-                if (window.PointerEvent) {
-                    // the browser supports javascript Pointer Events (currently only IE11), use those
-                    moveEvents = ['pointermove'];
-                    cancelEvents = ['pointercancel'];
-                    endEvents = ['pointerup'];
-                } else if (window.navigator.msPointerEnabled) {
-                    // the browser supports M$'s javascript Pointer Events (IE10), use those
-                    moveEvents = ['MSPointerMove'];
-                    cancelEvents = ['MSPointerCancel'];
-                    endEvents = ['MSPointerUp'];
-                }
-
-                // bind the move events
-                angular.forEach(moveEvents, function (event) {
-                    $document.bind(event, function (ev) {
-                        if (scope.sliding) {
-                            // they see me slidin', they hatin'
-                            ev.preventDefault();
-                            ev.stopPropagation();
-                            scope.onMove(ev);
-                        }
-                    });
-                });
-
-                // bind the end and cancel events
-                angular.forEach(cancelEvents.concat(endEvents), function (event) {
-                    $document.bind(event, function (ev) {
-                        if (scope.sliding) {
-                            // it's electric, boogie woogie, woogie
-
-                            // fire the end events for the drags that are ending
-                            if (ev.changedTouches) {
-                                for (var i = 0; i < ev.changedTouches.length; i++) {
-                                    scope.onEnd(ev.changedTouches[i].identifier);
-                                }
-                            } else {
-                                scope.onEnd(0);
+                            // update the model for the knob being dragged
+                            knobs[i].ngModel.$setViewValue(value);
+                            if (!scope.$$phase) {
+                                scope.$apply();
                             }
                         }
-                    });
+                    }
+                });
+            };
+
+            /**
+             * What to do when the slide is finished
+             */
+            scope.onEnd = function (index) {
+                // remove the knob from the list of knobs currently being dragged
+                var knobs = scope.currentKnobs[index] || [];
+                if (index < scope.currentKnobs.length) {
+                    delete scope.currentKnobs[index];
+                }
+
+                if (!angular.isArray(knobs)) {
+                    knobs = [knobs];
+                }
+
+                angular.forEach(knobs, function (knob) {
+                    // fire the knob's onEnd callback
+                    knob.onEnd();
                 });
 
-                // watch for disabilities
-                scope.$watch(function () {
-                    return scope.$eval(attr.ngDisabled);
-                }, function (disabled) {
-                    // do we have disabilities?
-                    scope.disabled = angular.isDefined(disabled) && disabled;
+                if (scope.currentKnobs.length == 0) {
+                    // we're no longer sliding
+                    scope.sliding = false;
+                }
+            };
 
-                    // tell the DOM
-                    if (scope.disabled) {
-                        elem.addClass('disabled');
-                    } else {
-                        elem.removeClass('disabled');
-                    }
+            scope.onResize = function () {
+                scope.fix();
+            };
 
+            // set the default events
+            var moveEvents = ['mousemove', 'touchmove'];
+            var cancelEvents = ['mousecancel', 'touchcancel'];
+            var endEvents = ['mouseup', 'touchend'];
+
+            if (window.PointerEvent) {
+                // the browser supports javascript Pointer Events (currently only IE11), use those
+                moveEvents = ['pointermove'];
+                cancelEvents = ['pointercancel'];
+                endEvents = ['pointerup'];
+            } else if (window.navigator.msPointerEnabled) {
+                // the browser supports M$'s javascript Pointer Events (IE10), use those
+                moveEvents = ['MSPointerMove'];
+                cancelEvents = ['MSPointerCancel'];
+                endEvents = ['MSPointerUp'];
+            }
+
+            // bind the move events
+            angular.forEach(moveEvents, function (event) {
+                $document.bind(event, function (ev) {
                     if (scope.sliding) {
-                        // I wanna wake up where you are, I won't say anything at all
-                        angular.forEach(scope.currentKnobs.keys(), function (index) {
-                            scope.onEnd(index);
-                        });
+                        // they see me slidin', they hatin'
+                        ev.preventDefault();
+                        ev.stopPropagation();
+                        scope.onMove(ev);
                     }
                 });
+            });
 
-                // watch the attributes and update as necessary
-                attr.$observe('ceiling', function (ceiling) {
+            // bind the end and cancel events
+            angular.forEach(cancelEvents.concat(endEvents), function (event) {
+                $document.bind(event, function (ev) {
+                    if (scope.sliding) {
+                        // it's electric, boogie woogie, woogie
+
+                        // fire the end events for the drags that are ending
+                        if (ev.changedTouches) {
+                            for (var i = 0; i < ev.changedTouches.length; i++) {
+                                scope.onEnd(ev.changedTouches[i].identifier);
+                            }
+                        } else {
+                            scope.onEnd(0);
+                        }
+                    }
+                });
+            });
+
+            // watch for disabilities
+            scope.$watch(function () {
+                return scope.$eval(attr.ngDisabled);
+            }, function (disabled) {
+                // do we have disabilities?
+                scope.disabled = angular.isDefined(disabled) && disabled;
+
+                // tell the DOM
+                if (scope.disabled) {
+                    elem.addClass('disabled');
+                } else {
+                    elem.removeClass('disabled');
+                }
+
+                if (scope.sliding) {
+                    // I wanna wake up where you are, I won't say anything at all
+                    angular.forEach(scope.currentKnobs.keys(), function (index) {
+                        scope.onEnd(index);
+                    });
+                }
+            });
+
+            // watch the attributes and update as necessary
+            attr.$observe('ceiling', function (ceiling) {
+                if (!ctrl.useValues()) {
                     ceiling = angular.isDefined(ceiling) ? parseFloat(ceiling) : 0;
                     scope.ceiling = isNaN(ceiling) ? 0 : ceiling;
                     scope.onResize();
-                });
-                attr.$observe('floor', function (floor) {
+                }
+            });
+            attr.$observe('floor', function (floor) {
+                if (!ctrl.useValues()) {
                     floor = angular.isDefined(floor) ? parseFloat(floor) : 0;
                     scope.floor = isNaN(floor) ? 0 : floor;
                     scope.onResize();
-                });
-                scope.$watch(function () {
-                    return scope.$eval(attr.drgSliderOptions);
-                }, function (opts) {
-                    ctrl.options = angular.extend({}, ctrl.defaultOptions, angular.isDefined(opts) && angular.isObject(opts) ? opts : {});
-                    if (ctrl.options.vertical) {
-                        elem.addClass('drg-slider-vertical').removeClass('drg-slider-horizontal');
-                    } else {
-                        elem.addClass('drg-slider-horizontal').removeClass('drg-slider-vertical');
-                    }
-                }, true);
+                }
+            });
+            scope.$watch(function () {
+                return scope.$eval(attr.drgSliderOptions);
+            }, function (opts) {
+                ctrl.options = angular.extend({}, ctrl.defaultOptions, angular.isDefined(opts) && angular.isObject(opts) ? opts : {});
+                ctrl.options.values.sort();
+                if (ctrl.useValues()) {
+                    scope.floor = ctrl.options.values[0];
+                    scope.ceiling = ctrl.options.values[ctrl.options.values.length - 1];
+                }
+                if (ctrl.options.vertical) {
+                    elem.addClass('drg-slider-vertical').removeClass('drg-slider-horizontal');
+                } else {
+                    elem.addClass('drg-slider-horizontal').removeClass('drg-slider-vertical');
+                }
+            }, true);
 
-                scope.$on('drgSlider.resize', scope.onResize);
-            };
+            scope.$on('drgSlider.resize', scope.onResize);
         }
     };
 }]);
