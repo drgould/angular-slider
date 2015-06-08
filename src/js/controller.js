@@ -40,7 +40,6 @@ angular.module( 'drg.slider' )
         }
 
         function sortKnobs() {
-            console.log( 'sortKnobs' );
             $scope.knobs.sort( knobSort );
         }
 
@@ -194,10 +193,8 @@ angular.module( 'drg.slider' )
                         console.warn( 'BOONDOGGLE!', position, values[ i ], values[ i + 1 ], floor, ceiling );
                         return undefined;
                     } else if( values[ i ] < floor ) {
-                        console.debug( 'below floor', values[ i + 1 ] );
                         return values[ i + 1 ];
                     } else if( values[ i + 1 ] > ceiling ) {
-                        console.debug( 'above ceiling', values[ i ] );
                         return values[ i ];
                     }
 

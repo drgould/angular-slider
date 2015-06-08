@@ -136,7 +136,6 @@ angular.module('drg.slider').controller('SliderCtrl', ["$scope", "$timeout", fun
     }
 
     function sortKnobs() {
-        console.log('sortKnobs');
         $scope.knobs.sort(knobSort);
     }
 
@@ -297,10 +296,8 @@ angular.module('drg.slider').controller('SliderCtrl', ["$scope", "$timeout", fun
                     console.warn('BOONDOGGLE!', position, values[i], values[i + 1], floor, ceiling);
                     return undefined;
                 } else if (values[i] < floor) {
-                    console.debug('below floor', values[i + 1]);
                     return values[i + 1];
                 } else if (values[i + 1] > ceiling) {
-                    console.debug('above ceiling', values[i]);
                     return values[i];
                 }
 
@@ -872,7 +869,9 @@ angular.module('drg.slider').directive('drgSlider', ["$document", "$compile", "$
                 return scope.$eval(attr.drgSliderOptions);
             }, function (opts) {
                 ctrl.options = angular.extend({}, ctrl.defaultOptions, angular.isDefined(opts) && angular.isObject(opts) ? opts : {});
-                ctrl.options.values.sort();
+                ctrl.options.values.sort(function (a, b) {
+                    return a - b;
+                });
                 if (ctrl.useValues()) {
                     scope.floor = ctrl.options.values[0];
                     scope.ceiling = ctrl.options.values[ctrl.options.values.length - 1];

@@ -249,7 +249,7 @@ angular.module( 'drg.slider' )
                     return scope.$eval( attr.drgSliderOptions );
                 }, function ( opts ) {
                     ctrl.options = angular.extend( {}, ctrl.defaultOptions, angular.isDefined( opts ) && angular.isObject( opts ) ? opts : {} );
-                    ctrl.options.values.sort();
+                    ctrl.options.values.sort( ( a, b ) => a - b );
                     if( ctrl.useValues() ) {
                         scope.floor = ctrl.options.values[ 0 ];
                         scope.ceiling = ctrl.options.values[ ctrl.options.values.length - 1 ];
