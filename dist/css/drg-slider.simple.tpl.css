@@ -1,18 +1,18 @@
-/* line 2, /Users/dgould/Documents/Projects/angular-slider/src/css/drg-slider.scss */
+/* line 2, /Users/rmcginty/Projects/angular-slider/src/css/drg-slider.scss */
 drg-slider,
 [drg-slider] {
   position: relative;
   display: block;
 }
 
-/* line 6, /Users/dgould/Documents/Projects/angular-slider/src/css/drg-slider.scss */
+/* line 6, /Users/rmcginty/Projects/angular-slider/src/css/drg-slider.scss */
 drg-slider,
 drg-slider *,
 [drg-slider], [drg-slider] * {
   box-sizing: border-box;
 }
 
-/* line 11, /Users/dgould/Documents/Projects/angular-slider/src/css/drg-slider.scss */
+/* line 11, /Users/rmcginty/Projects/angular-slider/src/css/drg-slider.scss */
 drg-slider drg-slider-knob,
 drg-slider [drg-slider-knob],
 [drg-slider] drg-slider-knob,
@@ -23,7 +23,7 @@ drg-slider [drg-slider-knob],
   touch-action: none;
 }
 
-/* line 19, /Users/dgould/Documents/Projects/angular-slider/src/css/drg-slider.scss */
+/* line 19, /Users/rmcginty/Projects/angular-slider/src/css/drg-slider.scss */
 drg-slider drg-slider-bar,
 drg-slider [drg-slider-bar],
 [drg-slider] drg-slider-bar,

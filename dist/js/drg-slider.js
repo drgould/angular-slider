@@ -727,12 +727,12 @@ angular.module('drg.slider').directive('drgSlider', ["$document", "$compile", "$
                             var max = 1;
 
                             if (!ctrl.options.continuous) {
-                                var index = scope.knobs.indexOf(knobs[i]);
-                                if (index > 0) {
-                                    min = ctrl.toPercent(scope.knobs[index - 1].ngModel.$modelValue);
+                                var idx = scope.knobs.indexOf(knobs[i]);
+                                if (idx > 0) {
+                                    min = ctrl.toPercent(scope.knobs[idx - 1].ngModel.$modelValue);
                                 }
-                                if (index < scope.knobs.length - 1) {
-                                    max = ctrl.toPercent(scope.knobs[index + 1].ngModel.$modelValue);
+                                if (idx < scope.knobs.length - 1) {
+                                    max = ctrl.toPercent(scope.knobs[idx + 1].ngModel.$modelValue);
                                 }
                             }
 
@@ -771,7 +771,7 @@ angular.module('drg.slider').directive('drgSlider', ["$document", "$compile", "$
                     knob.onEnd();
                 });
 
-                if (scope.currentKnobs.length == 0) {
+                if (scope.currentKnobs.length === 0) {
                     // we're no longer sliding
                     scope.sliding = false;
                 }
@@ -780,6 +780,8 @@ angular.module('drg.slider').directive('drgSlider', ["$document", "$compile", "$
             scope.onResize = function () {
                 scope.fix();
             };
+
+            var sliderId = '.drslider' + scope.$id;
 
             // set the default events
             var moveEvents = ['mousemove', 'touchmove'];
@@ -800,7 +802,7 @@ angular.module('drg.slider').directive('drgSlider', ["$document", "$compile", "$
 
             // bind the move events
             angular.forEach(moveEvents, function (event) {
-                $document.bind(event, function (ev) {
+                $document.bind(event + sliderId, function (ev) {
                     if (scope.sliding) {
                         // they see me slidin', they hatin'
                         ev.preventDefault();
@@ -812,7 +814,7 @@ angular.module('drg.slider').directive('drgSlider', ["$document", "$compile", "$
 
             // bind the end and cancel events
             angular.forEach(cancelEvents.concat(endEvents), function (event) {
-                $document.bind(event, function (ev) {
+                $document.bind(event + sliderId, function (ev) {
                     if (scope.sliding) {
                         // it's electric, boogie woogie, woogie
 
@@ -884,6 +886,10 @@ angular.module('drg.slider').directive('drgSlider', ["$document", "$compile", "$
             }, true);
 
             scope.$on('drgSlider.resize', scope.onResize);
+
+            scope.$on('$destroy', function () {
+                $document.off(sliderId);
+            });
         }
     };
 }]);

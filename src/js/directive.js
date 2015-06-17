@@ -107,7 +107,7 @@ angular.module( 'drg.slider' )
                                 var max = 1;
 
                                 if( !ctrl.options.continuous ) {
-                                    var idx = scope.knobs.idxOf( knobs[ i ] );
+                                    var idx = scope.knobs.indexOf( knobs[ i ] );
                                     if( idx > 0 ) {
                                         min = ctrl.toPercent( scope.knobs[ idx - 1 ].ngModel.$modelValue );
                                     }
