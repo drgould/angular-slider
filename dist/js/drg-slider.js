@@ -254,10 +254,10 @@ angular.module('drg.slider').controller('SliderCtrl', ["$scope", "$timeout", fun
      * @returns {number|undefined}
      */
     function nearestValue(position) {
-        var floor = arguments[1] === undefined ? $scope.floor : arguments[1];
-        var ceiling = arguments[2] === undefined ? $scope.ceiling : arguments[2];
-        var isValue = arguments[3] === undefined ? false : arguments[3];
-        var values = arguments[4] === undefined ? ctrl.options.values : arguments[4];
+        var floor = arguments.length <= 1 || arguments[1] === undefined ? $scope.floor : arguments[1];
+        var ceiling = arguments.length <= 2 || arguments[2] === undefined ? $scope.ceiling : arguments[2];
+        var isValue = arguments.length <= 3 || arguments[3] === undefined ? false : arguments[3];
+        var values = arguments.length <= 4 || arguments[4] === undefined ? ctrl.options.values : arguments[4];
 
         if (ctrl.isEqualSpacing() && !isValue) {
             // using equal spacing strategy
@@ -375,8 +375,8 @@ angular.module('drg.slider').controller('SliderCtrl', ["$scope", "$timeout", fun
      * @returns {number}
      */
     this.percentToValue = function (percent) {
-        var floor = arguments[1] === undefined ? $scope.floor : arguments[1];
-        var ceiling = arguments[2] === undefined ? $scope.ceiling : arguments[2];
+        var floor = arguments.length <= 1 || arguments[1] === undefined ? $scope.floor : arguments[1];
+        var ceiling = arguments.length <= 2 || arguments[2] === undefined ? $scope.ceiling : arguments[2];
 
         // compute the relative value
         var value = percent * (ceiling - floor) + floor;
@@ -895,7 +895,7 @@ angular.module('drg.slider').directive('drgSlider', ["$document", "$compile", "$
 }]);
 'use strict';
 
-angular.module('drg.slider').directive('drgSliderKnob', ["$parse", function ($parse) {
+angular.module('drg.slider').directive('drgSliderKnob', ["$parse", "$timeout", function ($parse, $timeout) {
     return {
         restrict: 'EA',
         require: ['^drgSlider', '^ngModel'],
@@ -903,7 +903,7 @@ angular.module('drg.slider').directive('drgSliderKnob', ["$parse", function ($pa
         compile: function compile(elem, attr) {
             // make sure we have a model
             if (angular.isUndefined(attr.ngModel)) {
-                throw 'ngSliderKnob Error: ngModel not specified';
+                throw "ngSliderKnob Error: ngModel not specified";
             }
 
             return function (scope, elem, attr, ctrls) {
@@ -925,6 +925,15 @@ angular.module('drg.slider').directive('drgSliderKnob', ["$parse", function ($pa
                     }
                 }
 
+                /**
+                 * Move the knob to the correct position
+                 * @param value
+                 */
+                function updateKnob(value) {
+                    // set the CSS as needed
+                    elem.css(ngSliderCtrl.options.vertical ? 'top' : 'left', ngSliderCtrl.valueToPercent(value, elem) + '%');
+                }
+
                 // register the knob
                 var knob = ngSliderCtrl.registerKnob({
                     ngModel: ngModelCtrl, // the model
@@ -933,12 +942,10 @@ angular.module('drg.slider').directive('drgSliderKnob', ["$parse", function ($pa
                         // what to do when the model changes
                         // sync the model
                         updateModel(value);
+                        updateKnob(value);
 
                         // expose the value to the scope
                         scope.$viewValue = value;
-
-                        // set the CSS as needed
-                        elem.css(ngSliderCtrl.options.vertical ? 'top' : 'left', ngSliderCtrl.valueToPercent(value, elem) + '%');
                     },
                     onStart: function onStart() {
                         // what to do when the user starts dragging this knob
@@ -985,6 +992,10 @@ angular.module('drg.slider').directive('drgSliderKnob', ["$parse", function ($pa
                         ev.stopPropagation();
                         knob.start(ev);
                     });
+                });
+
+                $timeout(function () {
+                    updateKnob(scope.$viewValue);
                 });
             };
         }

@@ -1,18 +1,18 @@
-/* line 2, /Users/rmcginty/Projects/angular-slider/src/css/drg-slider.scss */
+/* line 1, /Users/dgould/Documents/Projects/angular-slider/src/css/drg-slider.scss */
 drg-slider,
 [drg-slider] {
   position: relative;
   display: block;
 }
 
-/* line 6, /Users/rmcginty/Projects/angular-slider/src/css/drg-slider.scss */
-drg-slider,
-drg-slider *,
-[drg-slider], [drg-slider] * {
+/* line 6, /Users/dgould/Documents/Projects/angular-slider/src/css/drg-slider.scss */
+drg-slider, drg-slider *,
+[drg-slider],
+[drg-slider] * {
   box-sizing: border-box;
 }
 
-/* line 11, /Users/rmcginty/Projects/angular-slider/src/css/drg-slider.scss */
+/* line 10, /Users/dgould/Documents/Projects/angular-slider/src/css/drg-slider.scss */
 drg-slider drg-slider-knob,
 drg-slider [drg-slider-knob],
 [drg-slider] drg-slider-knob,
@@ -23,7 +23,7 @@ drg-slider [drg-slider-knob],
   touch-action: none;
 }
 
-/* line 19, /Users/rmcginty/Projects/angular-slider/src/css/drg-slider.scss */
+/* line 18, /Users/dgould/Documents/Projects/angular-slider/src/css/drg-slider.scss */
 drg-slider drg-slider-bar,
 drg-slider [drg-slider-bar],
 [drg-slider] drg-slider-bar,
@@ -34,7 +34,7 @@ drg-slider [drg-slider-bar],
   touch-action: none;
 }
 
-/* line 19, stdin */
+/* line 18, /Users/dgould/Documents/Projects/angular-slider/src/css/simple.tpl.scss */
 drg-slider,
 [drg-slider] {
   background-color: #EEEEEE;
@@ -43,14 +43,14 @@ drg-slider,
   border-radius: 5px;
 }
 
-/* line 25, stdin */
+/* line 25, /Users/dgould/Documents/Projects/angular-slider/src/css/simple.tpl.scss */
 drg-slider.drg-slider-horizontal,
 [drg-slider].drg-slider-horizontal {
   width: 500px;
   height: 10px;
 }
 
-/* line 30, stdin */
+/* line 29, /Users/dgould/Documents/Projects/angular-slider/src/css/simple.tpl.scss */
 drg-slider.drg-slider-horizontal drg-slider-knob,
 drg-slider.drg-slider-horizontal [drg-slider-knob],
 [drg-slider].drg-slider-horizontal drg-slider-knob,
@@ -58,7 +58,7 @@ drg-slider.drg-slider-horizontal [drg-slider-knob],
   top: -4px !important;
 }
 
-/* line 35, stdin */
+/* line 34, /Users/dgould/Documents/Projects/angular-slider/src/css/simple.tpl.scss */
 drg-slider.drg-slider-horizontal drg-slider-bar,
 drg-slider.drg-slider-horizontal [drg-slider-bar],
 [drg-slider].drg-slider-horizontal drg-slider-bar,
@@ -67,7 +67,7 @@ drg-slider.drg-slider-horizontal [drg-slider-bar],
   height: 100% !important;
 }
 
-/* line 39, stdin */
+/* line 39, /Users/dgould/Documents/Projects/angular-slider/src/css/simple.tpl.scss */
 drg-slider.drg-slider-horizontal drg-slider-bar:first-of-type,
 drg-slider.drg-slider-horizontal [drg-slider-bar]:first-of-type,
 [drg-slider].drg-slider-horizontal drg-slider-bar:first-of-type,
@@ -75,7 +75,7 @@ drg-slider.drg-slider-horizontal [drg-slider-bar]:first-of-type,
   border-radius: 5px 0 0 5px;
 }
 
-/* line 42, stdin */
+/* line 42, /Users/dgould/Documents/Projects/angular-slider/src/css/simple.tpl.scss */
 drg-slider.drg-slider-horizontal drg-slider-bar:last-of-type,
 drg-slider.drg-slider-horizontal [drg-slider-bar]:last-of-type,
 [drg-slider].drg-slider-horizontal drg-slider-bar:last-of-type,
@@ -83,14 +83,14 @@ drg-slider.drg-slider-horizontal [drg-slider-bar]:last-of-type,
   border-radius: 0 5px 5px 0;
 }
 
-/* line 47, stdin */
+/* line 47, /Users/dgould/Documents/Projects/angular-slider/src/css/simple.tpl.scss */
 drg-slider.drg-slider-vertical,
 [drg-slider].drg-slider-vertical {
   width: 10px;
   height: 500px;
 }
 
-/* line 52, stdin */
+/* line 51, /Users/dgould/Documents/Projects/angular-slider/src/css/simple.tpl.scss */
 drg-slider.drg-slider-vertical drg-slider-knob,
 drg-slider.drg-slider-vertical [drg-slider-knob],
 [drg-slider].drg-slider-vertical drg-slider-knob,
@@ -98,7 +98,7 @@ drg-slider.drg-slider-vertical [drg-slider-knob],
   left: -4px !important;
 }
 
-/* line 57, stdin */
+/* line 56, /Users/dgould/Documents/Projects/angular-slider/src/css/simple.tpl.scss */
 drg-slider.drg-slider-vertical drg-slider-bar,
 drg-slider.drg-slider-vertical [drg-slider-bar],
 [drg-slider].drg-slider-vertical drg-slider-bar,
@@ -107,7 +107,7 @@ drg-slider.drg-slider-vertical [drg-slider-bar],
   width: 100% !important;
 }
 
-/* line 61, stdin */
+/* line 61, /Users/dgould/Documents/Projects/angular-slider/src/css/simple.tpl.scss */
 drg-slider.drg-slider-vertical drg-slider-bar:first-of-type,
 drg-slider.drg-slider-vertical [drg-slider-bar]:first-of-type,
 [drg-slider].drg-slider-vertical drg-slider-bar:first-of-type,
@@ -115,7 +115,7 @@ drg-slider.drg-slider-vertical [drg-slider-bar]:first-of-type,
   border-radius: 5px 5px 0 0;
 }
 
-/* line 64, stdin */
+/* line 64, /Users/dgould/Documents/Projects/angular-slider/src/css/simple.tpl.scss */
 drg-slider.drg-slider-vertical drg-slider-bar:last-of-type,
 drg-slider.drg-slider-vertical [drg-slider-bar]:last-of-type,
 [drg-slider].drg-slider-vertical drg-slider-bar:last-of-type,
@@ -123,7 +123,7 @@ drg-slider.drg-slider-vertical [drg-slider-bar]:last-of-type,
   border-radius: 0 0 5px 5px;
 }
 
-/* line 71, stdin */
+/* line 70, /Users/dgould/Documents/Projects/angular-slider/src/css/simple.tpl.scss */
 drg-slider drg-slider-knob,
 drg-slider [drg-slider-knob],
 [drg-slider] drg-slider-knob,
@@ -135,10 +135,8 @@ drg-slider [drg-slider-knob],
   border-radius: 8px;
 }
 
-/* line 80, stdin */
-drg-slider drg-slider-knob:hover,
-drg-slider drg-slider-knob:focus,
-drg-slider drg-slider-knob.active,
+/* line 78, /Users/dgould/Documents/Projects/angular-slider/src/css/simple.tpl.scss */
+drg-slider drg-slider-knob:hover, drg-slider drg-slider-knob:focus, drg-slider drg-slider-knob.active,
 drg-slider [drg-slider-knob]:hover,
 drg-slider [drg-slider-knob]:focus,
 drg-slider [drg-slider-knob].active,
@@ -153,7 +151,7 @@ drg-slider [drg-slider-knob].active,
   cursor: pointer;
 }
 
-/* line 89, stdin */
+/* line 89, /Users/dgould/Documents/Projects/angular-slider/src/css/simple.tpl.scss */
 drg-slider drg-slider-bar:nth-last-of-type(odd),
 drg-slider [drg-slider-bar]:nth-last-of-type(odd),
 [drg-slider] drg-slider-bar:nth-last-of-type(odd),
@@ -161,10 +159,8 @@ drg-slider [drg-slider-bar]:nth-last-of-type(odd),
   background-color: #f56b3a;
 }
 
-/* line 94, stdin */
-drg-slider drg-slider-bar:nth-last-of-type(odd):hover,
-drg-slider drg-slider-bar:nth-last-of-type(odd):focus,
-drg-slider drg-slider-bar:nth-last-of-type(odd).active,
+/* line 92, /Users/dgould/Documents/Projects/angular-slider/src/css/simple.tpl.scss */
+drg-slider drg-slider-bar:nth-last-of-type(odd):hover, drg-slider drg-slider-bar:nth-last-of-type(odd):focus, drg-slider drg-slider-bar:nth-last-of-type(odd).active,
 drg-slider [drg-slider-bar]:nth-last-of-type(odd):hover,
 drg-slider [drg-slider-bar]:nth-last-of-type(odd):focus,
 drg-slider [drg-slider-bar]:nth-last-of-type(odd).active,
@@ -177,7 +173,7 @@ drg-slider [drg-slider-bar]:nth-last-of-type(odd).active,
   background-color: #d8410b;
 }
 
-/* line 98, stdin */
+/* line 98, /Users/dgould/Documents/Projects/angular-slider/src/css/simple.tpl.scss */
 drg-slider drg-slider-bar:nth-last-of-type(even),
 drg-slider [drg-slider-bar]:nth-last-of-type(even),
 [drg-slider] drg-slider-bar:nth-last-of-type(even),
@@ -185,10 +181,8 @@ drg-slider [drg-slider-bar]:nth-last-of-type(even),
   background-color: #2e3974;
 }
 
-/* line 103, stdin */
-drg-slider drg-slider-bar:nth-last-of-type(even):hover,
-drg-slider drg-slider-bar:nth-last-of-type(even):focus,
-drg-slider drg-slider-bar:nth-last-of-type(even).active,
+/* line 101, /Users/dgould/Documents/Projects/angular-slider/src/css/simple.tpl.scss */
+drg-slider drg-slider-bar:nth-last-of-type(even):hover, drg-slider drg-slider-bar:nth-last-of-type(even):focus, drg-slider drg-slider-bar:nth-last-of-type(even).active,
 drg-slider [drg-slider-bar]:nth-last-of-type(even):hover,
 drg-slider [drg-slider-bar]:nth-last-of-type(even):focus,
 drg-slider [drg-slider-bar]:nth-last-of-type(even).active,
@@ -201,10 +195,8 @@ drg-slider [drg-slider-bar]:nth-last-of-type(even).active,
   background-color: #181e3d;
 }
 
-/* line 110, stdin */
-drg-slider drg-slider-bar:hover,
-drg-slider drg-slider-bar:focus,
-drg-slider drg-slider-bar.active,
+/* line 108, /Users/dgould/Documents/Projects/angular-slider/src/css/simple.tpl.scss */
+drg-slider drg-slider-bar:hover, drg-slider drg-slider-bar:focus, drg-slider drg-slider-bar.active,
 drg-slider [drg-slider-bar]:hover,
 drg-slider [drg-slider-bar]:focus,
 drg-slider [drg-slider-bar].active,

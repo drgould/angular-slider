@@ -1,5 +1,5 @@
 angular.module( 'drg.slider' )
-    .directive( 'drgSliderKnob', function ( $parse ) {
+    .directive( 'drgSliderKnob', function ( $parse, $timeout ) {
         return {
             restrict : 'EA',
             require : [ '^drgSlider', '^ngModel' ],
@@ -29,6 +29,15 @@ angular.module( 'drg.slider' )
                         }
                     }
 
+                    /**
+                     * Move the knob to the correct position
+                     * @param value
+                     */
+                    function updateKnob( value ) {
+                        // set the CSS as needed
+                        elem.css( ngSliderCtrl.options.vertical ? 'top' : 'left', ngSliderCtrl.valueToPercent( value, elem ) + '%' );
+                    }
+
                     // register the knob
                     var knob = ngSliderCtrl.registerKnob( {
                         ngModel : ngModelCtrl,			// the model
@@ -36,12 +45,11 @@ angular.module( 'drg.slider' )
                         onChange : function ( value ) {		// what to do when the model changes
                             // sync the model
                             updateModel( value );
+                            updateKnob( value );
 
                             // expose the value to the scope
                             scope.$viewValue = value;
 
-                            // set the CSS as needed
-                            elem.css( ngSliderCtrl.options.vertical ? 'top' : 'left', ngSliderCtrl.valueToPercent( value, elem ) + '%' );
                         },
                         onStart : function () {			// what to do when the user starts dragging this knob
                             elem.addClass( 'active' );
@@ -86,6 +94,10 @@ angular.module( 'drg.slider' )
                             ev.stopPropagation();
                             knob.start( ev );
                         } );
+                    } );
+
+                    $timeout( function() {
+                        updateKnob( scope.$viewValue );
                     } );
                 };
             }
